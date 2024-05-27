@@ -5,14 +5,14 @@ import relayConnections = require("./relay-connections");
 let pubClient: RedisClientType;
 
 export function StartConnection(redisServerURL: string, relayServerRealPort: any) {
-    pubClient = createClient({ url: redisServerURL });
-    // pubClient = createClient({
-    //     password: 'EYGOfLVV3GSRg5Ge8jNCUcLx9Gpys6VT',
-    //     socket: {
-    //         host: 'redis-11817.c281.us-east-1-2.ec2.cloud.redislabs.com',
-    //         port: 11817
-    //     }
-    // });
+    // pubClient = createClient({ url: redisServerURL });
+    pubClient = createClient({
+        password: 'EYGOfLVV3GSRg5Ge8jNCUcLx9Gpys6VT',
+        socket: {
+            host: 'redis-11817.c281.us-east-1-2.ec2.cloud.redislabs.com',
+            port: 11817
+        }
+    });
     pubClient.on('connect', () => {
         console.log('redis connected');
         ConnectClients(pubClient, subClient, relayServerRealPort);

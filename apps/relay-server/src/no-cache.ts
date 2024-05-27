@@ -6,6 +6,7 @@ export function StartConnection(redisServerURL: string, relayServerRealPort: any
     const app = require('express')();
     const server = require('http').createServer(app);
     const ioSocket = require('socket.io')(server, { path: "/wsockets" });
+    ioSocket.listen(Number(relayServerRealPort));
     relayConnections.InitializeConnection(ioSocket);
 }
 
