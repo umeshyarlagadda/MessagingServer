@@ -2,9 +2,14 @@ const mongoose = require("mongoose");
 
 const ChatRoomSchema = new mongoose.Schema({
     Name: { type: String },      // Room name
-    BrokerId: { type: mongoose.Schema.ObjectId, ref: "User" },
-    ClientId: { type: mongoose.Schema.ObjectId, ref: "User" },
-    CrBy: { type: mongoose.Schema.ObjectId, ref: "User" },
+    Members: [
+        {
+            _id: { type: mongoose.Schema.ObjectId, ref: "User" },
+            CrBy: { type: Boolean },                                            // This permission is set for user who created the room. This user is like superadmin
+            Admin: { type: Boolean },                                           // Admin rights is set for user who can invite/remove members to room
+            Write: { type: Boolean }                                            // This permission is set for user who can send message to group
+        }
+    ],
     CrDt: { type: Date, default: Date.now },
     Del: { type: Boolean }
 });

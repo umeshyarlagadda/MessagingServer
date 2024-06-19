@@ -32,7 +32,7 @@ export class SocketService {
         }
     }
 
-    EmitUpdatedValues(messageName: any, latestValues: any) {
+    EmitValueToSocket(messageName: any, latestValues: any) {
         if (this.socketConnected) {
             this.socket.emit(messageName, latestValues);
         }

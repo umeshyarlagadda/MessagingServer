@@ -6,7 +6,7 @@ const MessageSchema = new mongoose.Schema({
     Sender: { type: mongoose.Schema.ObjectId, ref: "User" },
     Receiver: { type: mongoose.Schema.ObjectId, ref: "User" },
     CrDt: { type: Date, default: Date.now },
-    Read: { type: Boolean }
+    ReadBy: [{ type: mongoose.Schema.ObjectId, ref: "User" }]
 });
 
 const Message = mongoose.model("Message", MessageSchema, "Messages");

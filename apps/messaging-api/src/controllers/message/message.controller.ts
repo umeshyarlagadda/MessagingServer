@@ -11,48 +11,38 @@ export class MessageController {
 
     constructor(public messageSrvc: MessageService) { }
 
-    @Post("CreateRoom")
+    @Post("SendPrivateMsg")
     @UseFilters(ExceptionHandler)
-    async createRoom(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.messageSrvc.CreateRoom(req.body, res.locals.User.Id);
+    async sendPrivateMessage(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.SendPrivateMessage(req.body);
         res.json(resp);
     }
 
-    @Delete("DeleteRoom/:roomId")
+    @Post("SendRoomMsg")
     @UseFilters(ExceptionHandler)
-    async deleteRoom(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.messageSrvc.DeleteRoom(req.params.roomId, res.locals.User.Id);
-        res.json(resp);
-    }
-
-    @Post("Send")
-    @UseFilters(ExceptionHandler)
-    async sendMessage(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.messageSrvc.SendMessage(req.body);
+    async sendRoomMessage(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.SendRoomMessage(req.body);
         res.json(resp);
     }
 
     @Put("MarkasRead")
     @UseFilters(ExceptionHandler)
     async markMessageAsRead(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.messageSrvc.MarkMessagesAsRead(req.body.MessageIds);
+        const resp = await this.messageSrvc.MarkMessagesAsRead(req.body.MessageIds, res.locals.User.Id);
         res.json(resp);
     }
 
-    @Get("Messages")
+    @Get("PrivateMessages")
+    @UseFilters(ExceptionHandler)
+    async getPrivateMessages(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetPrivateMessagesBetweenUsers(res.locals.User.Id, req.query.ParticipantId, req.query.Page, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("RoomMessages")
     @UseFilters(ExceptionHandler)
     async getChatRoomMessages(@Req() req: Request, @Res() res: Response) {
         const resp = await this.messageSrvc.GetMessagesOfRoom(req.query.RoomId, req.query.Page, req.query.ResultsPerPage);
-        res.json(resp);
-    }
-
-    @Get("ChatRooms")
-    @UseFilters(ExceptionHandler)
-    async getClientRooms(@Req() req: Request, @Res() res: Response) {
-        const loginUserId: ObjectId = new ObjectId(res.locals.User.Id);
-        const brokerId: ObjectId = new ObjectId(req.query.BrokerId.toString());
-        const clientId: ObjectId = new ObjectId(req.query.ClientId.toString());
-        const resp = await this.messageSrvc.GetAllMessageRoomsOfBrokerAndClient(brokerId, clientId, loginUserId);
         res.json(resp);
     }
 

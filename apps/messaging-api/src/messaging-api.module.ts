@@ -8,6 +8,8 @@ import { ExceptionHandler } from './utils/exception-handler/exception-handler';
 import { MessageService } from './services/message/message.service';
 import { SocketService } from './services/socket/socket.service';
 import { UserAuthGuardService } from './services/user-auth-guard/user-auth-guard.service';
+import { RoomController } from './controllers/room/room.controller';
+import { RoomService } from './services/room/room.service';
 const path = require("path");
 const multistream = require('pino-multi-stream').multistream;
 
@@ -31,10 +33,10 @@ export const LoggerStreams = [
             }, multistream(LoggerStreams)
         ]
     })],
-    controllers: [MessageController],
+    controllers: [MessageController, RoomController],
     providers: [{
         provide: APP_FILTER,
         useClass: ExceptionHandler
-    }, MessageService, SocketService, UserAuthGuardService],
+    }, MessageService, SocketService, UserAuthGuardService, RoomService],
 })
 export class MessagingApiModule { }
