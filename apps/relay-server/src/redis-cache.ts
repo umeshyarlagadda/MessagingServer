@@ -131,3 +131,12 @@ export async function GetUserOnlineState(userId:any){
         return false;
     }
 }
+
+export async function GetUserSockets(userId: any) {
+    const userStateInfo = await Get('UserState-' + userId);
+    if (userStateInfo != null){
+        return userStateInfo;
+    } else {
+        return [];
+    }
+}

@@ -57,6 +57,15 @@ export function GetUserOnlineState(userId: any) {
     }
 }
 
+export function GetUserSockets(userId: any) {
+    let userIndex = GetConnectedUserIndex(userId);
+    if (userIndex !== -1) {
+        return connectedClients[userIndex].Sockets;
+    } else {
+        return [];
+    }
+}
+
 function GetConnectedUserIndex(UserId: any) {
     let userIndex: number = connectedClients.findIndex((client: any) => {
         return client.UserId === UserId;
