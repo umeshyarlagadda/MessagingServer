@@ -34,7 +34,7 @@ export class SocketService {
 
     EmitValueToSocket(messageName: any, latestValues: any) {
         if (this.socketConnected) {
-            this.socket.emit(messageName, latestValues);
+            // this.socket.emit(messageName, latestValues);
         }
     }
 }

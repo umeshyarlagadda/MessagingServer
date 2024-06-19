@@ -14,5 +14,5 @@ const ChatRoomSchema = new mongoose.Schema({
     Del: { type: Boolean }
 });
 
-const ChatRoom = mongoose.model("ChatRoom", ChatRoomSchema, "ChatRooms");
+const ChatRoom = mongoose.model("SAPPChatRoom", ChatRoomSchema, "SAPPChatRooms");
 export { ChatRoom };

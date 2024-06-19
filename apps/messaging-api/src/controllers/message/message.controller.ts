@@ -46,4 +46,22 @@ export class MessageController {
         res.json(resp);
     }
 
+    @Get("GetUnreadPvtMsgDetails")
+    @UseFilters(ExceptionHandler)
+    async getUnreadPvtMsgDetails(@Req() req: Request, @Res() res: Response) {
+        const loginUserId: ObjectId = new ObjectId(res.locals.User.Id);
+        const resp = await this.messageSrvc.GetUnreadPvtMsgDetails(loginUserId);
+        res.json(resp);
+    }
+
+    @Get("GetUnreadRoomMsgDetails")
+    @UseFilters(ExceptionHandler)
+    async getUnreadRoomMsgDetails(@Req() req: Request, @Res() res: Response) {
+        const loginUserId: ObjectId = new ObjectId(res.locals.User.Id);
+        const resp = await this.messageSrvc.GetUnreadRoomMsgDetails(loginUserId);
+        res.json(resp);
+    }
+
+
+
 }

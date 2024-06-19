@@ -9,5 +9,5 @@ const MessageSchema = new mongoose.Schema({
     ReadBy: [{ type: mongoose.Schema.ObjectId, ref: "User" }]
 });
 
-const Message = mongoose.model("Message", MessageSchema, "Messages");
+const Message = mongoose.model("SAPPMessage", MessageSchema, "SAPPMessages");
 export { Message };

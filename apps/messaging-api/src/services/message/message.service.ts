@@ -13,7 +13,7 @@ export class MessageService {
 
     async MarkMessagesAsRead(messageIds: any, loginUserId: any) {
         try {
-            const updatedMsgInfo = await Message.updateMany({ _id: { $in: messageIds } }, { $push: { "ReadBy": loginUserId } });
+            const updatedMsgInfo = await Message.updateMany({ _id: { $in: messageIds } }, { $addToSet: { "ReadBy": loginUserId } });
             return updatedMsgInfo;
         } catch (error) {
             this.logger.error(`Error while MarkMessagesAsRead ${JSON.stringify(error)}`);
@@ -71,5 +71,67 @@ export class MessageService {
             throw error;
         }
     }
+
+    async GetUnreadPvtMsgDetails(loginUserId: any) {
+        try {
+            const messagesList = await Message.aggregate([
+                {
+                    $match: {
+                        Receiver: loginUserId,
+                        ReadBy: { $ne: loginUserId }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$Sender",
+                        UnreadCount: { $sum: 1 }
+                    }
+                },
+                {
+                    $project: {
+                        SenderId: "$_id",
+                        UnreadCount: 1,
+                        _id: 0
+                    }
+                }
+            ]);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetUnreadPvtMsgDetails ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async GetUnreadRoomMsgDetails(loginUserId: any) {
+        try {
+            const messagesList = await Message.aggregate([
+                {
+                    $match: {
+                        Members: loginUserId,
+                        ReadBy: { $ne: loginUserId }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$RoomId",
+                        UnreadCount: { $sum: 1 }
+                    }
+                },
+                {
+                    $project: {
+                        RoomId: "$_id",
+                        UnreadCount: 1,
+                        _id: 0
+                    }
+                }
+            ]);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetUnreadRoomMsgDetails ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+
 
 }

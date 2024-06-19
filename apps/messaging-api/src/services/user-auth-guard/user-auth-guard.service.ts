@@ -26,8 +26,9 @@ export class UserAuthGuardService implements CanActivate {
       if (authHeader) {
         const token = authHeader.split(" ")[1];
         if (token != null) {
+          const userId = (token === '1718801169348-96a37b52-0768-49de-a9ac-fbe170486398') ? '610279535260f10b5593d9a2' : '63d3ef71cffaf0a4a87229ac';
           res.locals.User = {
-            Id: '123'
+            Id: userId
           };
           resolve({
             Valid: true
