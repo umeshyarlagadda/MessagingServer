@@ -49,14 +49,18 @@ export function InitializeConnection(argIOSocket: any) {
             });
         });
 
-        socket.on("JoinMessageRoom", async function (payload: any) {
-            console.log("User Joining Chat Room for " + payload);
-            socket.join(payload);
+        socket.on("JoinMessageRoom", async function (roomIds: any) {
+            console.log("User Joining Chat Room for " + JSON.stringify(roomIds));
+            roomIds.forEach((roomId: any) => {
+                socket.join(roomId);
+            });
         });
 
-        socket.on("LeaveMessageRoom", async function (payload: any) {
-            console.log("User Leaving Chat Room for " + payload);
-            socket.leave(payload);
+        socket.on("LeaveMessageRoom", async function (roomIds: any) {
+            console.log("User Leaving Chat Room for " + JSON.stringify(roomIds));
+            roomIds.forEach((roomId: any) => {
+                socket.leave(roomId);
+            });
         });
 
         socket.on("NewChatRoomMessage", function (payload: any) {
@@ -65,14 +69,14 @@ export function InitializeConnection(argIOSocket: any) {
 
         socket.on("NewPrivateMessage", function (payload: any) {
             const sockets = cacheClient.GetUserSockets(payload.Receiver);
-            sockets.forEach((argSocket:any)=>{
+            sockets.forEach((argSocket: any) => {
                 ioSocket.to(argSocket).emit("NewMessage", payload);
             });
         });
 
         socket.on("UserPvtMsgTyping", function (payload: any) {
             const sockets = cacheClient.GetUserSockets(payload.Receiver);
-            sockets.forEach((argSocket:any)=>{
+            sockets.forEach((argSocket: any) => {
                 ioSocket.to(argSocket).emit("UserTyping", payload);
             });
         });
@@ -84,7 +88,7 @@ export function InitializeConnection(argIOSocket: any) {
 
         socket.on("PvtMessageRead", function (payload: any) {
             const sockets = cacheClient.GetUserSockets(payload.SentBy);
-            sockets.forEach((argSocket:any)=>{
+            sockets.forEach((argSocket: any) => {
                 ioSocket.to(argSocket).emit("MessageRead", payload);
             });
         });

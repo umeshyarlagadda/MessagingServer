@@ -106,9 +106,7 @@ export class RoomService {
                 }, 
                 Del: { $ne: true }
             };
-            console.log(query);
             const roomsList = await ChatRoom.find(query);
-            console.log(roomsList.length);
             return roomsList;
         } catch (error) {
             this.logger.error(`Error while GetChatRooms ${JSON.stringify(error)}`);

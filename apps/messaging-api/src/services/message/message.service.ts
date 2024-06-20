@@ -104,28 +104,52 @@ export class MessageService {
 
     async GetUnreadRoomMsgDetails(loginUserId: any) {
         try {
-            const messagesList = await Message.aggregate([
+            const roomsList = await ChatRoom.aggregate([
+                // Match chatrooms where the user is a member
                 {
                     $match: {
-                        Members: loginUserId,
-                        ReadBy: { $ne: loginUserId }
+                        "Members.UserId": loginUserId, // Replace userId with the actual user ID
                     }
                 },
+                // Lookup messages collection to find unread messages sent by others
                 {
-                    $group: {
-                        _id: "$RoomId",
-                        UnreadCount: { $sum: 1 }
+                    $lookup: {
+                        from: "SAPPMessages",
+                        let: { roomId: "$_id", userId: loginUserId }, // Use $_id from chatrooms and userId from match stage
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$RoomId", "$$roomId"] }, // Match messages with roomId from chatrooms
+                                            { $ne: ["$Sender", "$$userId"] }, // Message not sent by the user
+                                            { $not: { $in: ["$$userId", "$ReadBy"] } } // User has not read the message
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                $count: "unreadMessageCount" // Count unread messages for each chatroom
+                            }
+                        ],
+                        as: "unreadMessages"
                     }
                 },
+                // Filter chatrooms with unread messages
+                {
+                    $match: {
+                        unreadMessages: { $ne: [] } // Filter chatrooms with unread messages
+                    }
+                },
+                // Project to include necessary fields
                 {
                     $project: {
-                        RoomId: "$_id",
-                        UnreadCount: 1,
-                        _id: 0
+                        _id: 1,
+                        UnreadCount: { $arrayElemAt: ["$unreadMessages.unreadMessageCount", 0] } // Get unreadMessageCount from array
                     }
                 }
-            ]);
-            return messagesList;
+            ])
+            return roomsList;
         } catch (error) {
             this.logger.error(`Error while GetUnreadRoomMsgDetails ${JSON.stringify(error)}`);
             throw error;
