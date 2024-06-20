@@ -16,8 +16,9 @@ export class RoomService {
                 Name: roomName,
                 Members: [
                     {
-                        _id: loginUserId,
+                        UserId: loginUserId,
                         CrBy: true,
+                        Dt: new Date()
                         // Admin:true,
                         // Write:true
                     }
@@ -37,7 +38,7 @@ export class RoomService {
             const updateRoomInfo = await ChatRoom.findOneAndUpdate({
                 _id: roomId,
                 Members: {
-                    $elemMatch: { "_id": loginUserId, "CrBy": true }
+                    $elemMatch: { "UserId": loginUserId, "CrBy": true }
                 },
             }, { $set: { Del: true } }, { new: true });
             return updateRoomInfo;
@@ -52,7 +53,7 @@ export class RoomService {
             const updateRoomInfo = await ChatRoom.findOneAndUpdate({
                 _id: roomId,
                 Members: {
-                    $elemMatch: { "_id": loginUserId, "Admin": true }
+                    $elemMatch: { "UserId": loginUserId, "Admin": true }
                 },
             }, { $set: { Name: roomName } }, { new: true });
             return updateRoomInfo;
@@ -64,8 +65,9 @@ export class RoomService {
 
     async AddMemberInRoom(newMemberInfo: any, roomId: any) {
         try {
+            newMemberInfo.Dt = new Date();
             const updateRoomInfo = await ChatRoom.findOneAndUpdate({
-                "_id": roomId, "Members._id": { $ne: newMemberInfo._id }
+                "_id": roomId, "Members.UserId": { $ne: newMemberInfo.UserId }
             }, { $addToSet: { Members: newMemberInfo } }, { new: true });
             return updateRoomInfo;
         } catch (error) {
@@ -77,7 +79,7 @@ export class RoomService {
     async UpdateMemberInRoom(existingMemberInfo: any, roomId: any) {
         try {
             const updateRoomInfo = await ChatRoom.findOneAndUpdate({
-                "_id": roomId, "Members._id": existingMemberInfo._id
+                "_id": roomId, "Members.UserId": existingMemberInfo.UserId
             }, { $set: { "Members.$": existingMemberInfo } }, { new: true });
             return updateRoomInfo;
         } catch (error) {
@@ -88,7 +90,7 @@ export class RoomService {
 
     async RemoveMemberInRoom(memberId: any, roomId: any) {
         try {
-            const updateRoomInfo = await ChatRoom.findOneAndUpdate({ _id: roomId }, { $pull: { "Members": { "_id": memberId } } }, { new: true });
+            const updateRoomInfo = await ChatRoom.findOneAndUpdate({ _id: roomId }, { $pull: { "Members": { "UserId": memberId } } }, { new: true });
             return updateRoomInfo;
         } catch (error) {
             this.logger.error(`Error while RemoveMemberInRoom ${JSON.stringify(error)}`);
@@ -98,7 +100,15 @@ export class RoomService {
 
     async GetChatRooms(loginUserId: any) {
         try {
-            const roomsList = await ChatRoom.find({ "Members._id": loginUserId, "Del": { $ne: true } });
+            const query = {
+                Members: {
+                    $elemMatch: { "UserId": loginUserId }
+                }, 
+                Del: { $ne: true }
+            };
+            console.log(query);
+            const roomsList = await ChatRoom.find(query);
+            console.log(roomsList.length);
             return roomsList;
         } catch (error) {
             this.logger.error(`Error while GetChatRooms ${JSON.stringify(error)}`);
