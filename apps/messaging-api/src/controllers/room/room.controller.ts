@@ -6,7 +6,7 @@ import { UserAuthGuardService } from '../../services/user-auth-guard/user-auth-g
 import { MessageService } from '../../services/message/message.service';
 import { RoomService } from '../../services/room/room.service';
 
-@Controller('api/secure/Room')
+@Controller('messageapi/secure/Room')
 @UseGuards(UserAuthGuardService)
 export class RoomController {
 

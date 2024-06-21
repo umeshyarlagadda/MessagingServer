@@ -5,7 +5,7 @@ import { ExceptionHandler } from '../../utils/exception-handler/exception-handle
 import { UserAuthGuardService } from '../../services/user-auth-guard/user-auth-guard.service';
 import { MessageService } from '../../services/message/message.service';
 
-@Controller('api/secure/Message')
+@Controller('messageapi/secure/Message')
 @UseGuards(UserAuthGuardService)
 export class MessageController {
 

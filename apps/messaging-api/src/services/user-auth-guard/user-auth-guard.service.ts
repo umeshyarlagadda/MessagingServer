@@ -22,23 +22,16 @@ export class UserAuthGuardService implements CanActivate {
 
   verifyJWT(req: Request, res: Response) {
     return new Promise(async (resolve, reject) => {
+      const userId: any = req.headers["userid"];
       const authHeader = req.headers["authorization"];
-      if (authHeader) {
-        const token = authHeader.split(" ")[1];
-        if (token != null) {
-          const userId = (token === '1718801169348-96a37b52-0768-49de-a9ac-fbe170486398') ? '610279535260f10b5593d9a2' : '63d3ef71cffaf0a4a87229ac';
-          res.locals.User = {
-            Id: userId
-          };
-          resolve({
-            Valid: true
-          });
-        } else {
-          resolve({
-            Valid: false,
-            Code: 403
-          });
-        }
+      const token = (authHeader) ? authHeader.split(" ")[1] : null;
+      if (token != null && userId != null) {
+        res.locals.User = {
+          Id: userId
+        };
+        resolve({
+          Valid: true
+        });
       } else {
         resolve({
           Valid: false,
