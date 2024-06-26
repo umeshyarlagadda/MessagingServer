@@ -193,7 +193,7 @@ export class MessageService {
                 // Lookup messages collection to find unread messages sent by others
                 {
                     $lookup: {
-                        from: "SAPPMessages",
+                        from: "ConnectX.Messages",
                         let: { roomId: "$_id", userId: loginUserId }, // Use $_id from chatrooms and userId from match stage
                         pipeline: [
                             {
