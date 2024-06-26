@@ -32,17 +32,59 @@ export class MessageController {
         res.json(resp);
     }
 
-    @Get("PrivateMessages")
+    @Get("InitialPrivateMessages")
     @UseFilters(ExceptionHandler)
-    async getPrivateMessages(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.messageSrvc.GetPrivateMessagesBetweenUsers(res.locals.User.Id, req.query.ParticipantId, req.query.Page, req.query.ResultsPerPage);
+    async getInitialPrivateMessagesBetweenUsers(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetInitialPrivateMessagesBetweenUsers(res.locals.User.Id, req.query.ParticipantId, req.query.ResultsPerPage);
         res.json(resp);
     }
 
-    @Get("RoomMessages")
+    @Get("InitialRoomMessages")
     @UseFilters(ExceptionHandler)
-    async getChatRoomMessages(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.messageSrvc.GetMessagesOfRoom(req.query.RoomId, req.query.Page, req.query.ResultsPerPage);
+    async getInitialMessagesOfRoom(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetInitialMessagesOfRoom(req.query.RoomId, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("NextPrivateMessages")
+    @UseFilters(ExceptionHandler)
+    async getNextPrivateMessagesBetweenUsers(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetNextPrivateMessagesBetweenUsers(res.locals.User.Id, req.query.ParticipantId, req.query.RecordId, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("NextRoomMessages")
+    @UseFilters(ExceptionHandler)
+    async getNextMessagesOfRoom(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetNextMessagesOfRoom(req.query.RoomId, req.query.RecordId, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("PreviousPrivateMessages")
+    @UseFilters(ExceptionHandler)
+    async getPreviousPrivateMessagesBetweenUsers(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetPreviousPrivateMessagesBetweenUsers(res.locals.User.Id, req.query.ParticipantId, req.query.RecordId, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("PreviousRoomMessages")
+    @UseFilters(ExceptionHandler)
+    async getPreviousMessagesOfRoom(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetPreviousMessagesOfRoom(req.query.RoomId, req.query.RecordId, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("PrivateMessagesByDate")
+    @UseFilters(ExceptionHandler)
+    async getPrivateMessagesByDate(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetPrivateMessagesBetweenUsersByDate(res.locals.User.Id, req.query.ParticipantId, req.query.SearchDt, req.query.ResultsPerPage);
+        res.json(resp);
+    }
+
+    @Get("RoomMessagesByDate")
+    @UseFilters(ExceptionHandler)
+    async getChatRoomMessagesByDate(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.GetMessagesOfRoomByDate(req.query.RoomId, req.query.SearchDt, req.query.ResultsPerPage);
         res.json(resp);
     }
 

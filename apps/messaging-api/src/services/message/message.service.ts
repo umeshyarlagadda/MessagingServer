@@ -45,15 +45,24 @@ export class MessageService {
         }
     }
 
-    async GetPrivateMessagesBetweenUsers(loginUserId: any, participantUserId: any, pageNumber: any, resultsPerRequest: any) {
+    async GetInitialPrivateMessagesBetweenUsers(loginUserId: any, participantUserId: any, resultsPerRequest: any) {
         try {
-            const skipResults = (pageNumber == null || pageNumber == '') ? 0 : (Number(pageNumber) * resultsPerRequest);
             const messagesList = await Message.find({
                 $or: [
                     { Sender: loginUserId, Receiver: participantUserId },
                     { Sender: participantUserId, Receiver: loginUserId }
                 ]
-            }).sort({ _id: -1 }).skip(skipResults).limit(resultsPerRequest);
+            }).sort({ _id: -1 }).limit(resultsPerRequest);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetInitialPrivateMessagesBetweenUsers ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async GetInitialMessagesOfRoom(roomId: any, resultsPerRequest: any) {
+        try {
+            const messagesList = await Message.find({ RoomId: roomId }).sort({ _id: -1 }).limit(resultsPerRequest);
             return messagesList;
         } catch (error) {
             this.logger.error(`Error while GetMessagesOfRoom ${JSON.stringify(error)}`);
@@ -61,13 +70,83 @@ export class MessageService {
         }
     }
 
-    async GetMessagesOfRoom(roomId: any, pageNumber: any, resultsPerRequest: any) {
+    async GetNextPrivateMessagesBetweenUsers(loginUserId: any, participantUserId: any, lastRecordId: any, resultsPerRequest: any) {
         try {
-            const skipResults = (pageNumber == null || pageNumber == '') ? 0 : (Number(pageNumber) * resultsPerRequest);
-            const messagesList = await Message.find({ RoomId: roomId }).sort({ _id: -1 }).skip(skipResults).limit(resultsPerRequest);
+            const messagesList = await Message.find({
+                _id: { $gt: lastRecordId },
+                $or: [
+                    { Sender: loginUserId, Receiver: participantUserId },
+                    { Sender: participantUserId, Receiver: loginUserId }
+                ]
+            }).limit(resultsPerRequest);
             return messagesList;
         } catch (error) {
-            this.logger.error(`Error while GetMessagesOfRoom ${JSON.stringify(error)}`);
+            this.logger.error(`Error while GetNextPrivateMessagesBetweenUsers ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async GetNextMessagesOfRoom(roomId: any, lastRecordId: any, resultsPerRequest: any) {
+        try {
+            const messagesList = await Message.find({ _id: { $gt: lastRecordId }, RoomId: roomId }).limit(resultsPerRequest);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetNextMessagesOfRoom ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async GetPreviousPrivateMessagesBetweenUsers(loginUserId: any, participantUserId: any, firstRecordId: any, resultsPerRequest: any) {
+        try {
+            const messagesList = await Message.find({
+                _id: { $lt: firstRecordId },
+                $or: [
+                    { Sender: loginUserId, Receiver: participantUserId },
+                    { Sender: participantUserId, Receiver: loginUserId }
+                ]
+            }).sort({ _id: -1 }).limit(resultsPerRequest);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetPreviousPrivateMessagesBetweenUsers ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async GetPreviousMessagesOfRoom(roomId: any, firstRecordId: any, resultsPerRequest: any) {
+        try {
+            const messagesList = await Message.find({ _id: { $lt: firstRecordId }, RoomId: roomId }).sort({ _id: -1 }).limit(resultsPerRequest);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetPreviousMessagesOfRoom ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+
+
+
+    async GetPrivateMessagesBetweenUsersByDate(loginUserId: any, participantUserId: any, searchDt: any, resultsPerRequest: any) {
+        try {
+            const messagesList = await Message.find({
+                CrDt: { $gte: searchDt },
+                $or: [
+                    { Sender: loginUserId, Receiver: participantUserId },
+                    { Sender: participantUserId, Receiver: loginUserId }
+                ]
+            }).limit(resultsPerRequest);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetPrivateMessagesBetweenUsersByDate ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async GetMessagesOfRoomByDate(roomId: any, searchDt: any, resultsPerRequest: any) {
+        try {
+            const messagesList = await Message.find({ CrDt: { $gte: searchDt }, RoomId: roomId }).limit(resultsPerRequest);
+            return messagesList;
+        } catch (error) {
+            this.logger.error(`Error while GetMessagesOfRoomByDate ${JSON.stringify(error)}`);
             throw error;
         }
     }
@@ -155,7 +234,5 @@ export class MessageService {
             throw error;
         }
     }
-
-
 
 }
