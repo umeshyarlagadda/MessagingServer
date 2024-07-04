@@ -21,6 +21,26 @@ export class MessageService {
         }
     }
 
+    async MarkMessagesAsFavorite(messageId: any, loginUserId: any) {
+        try {
+            const updatedMsgInfo = await Message.findOneAndUpdate({ _id: messageId }, { $addToSet: { "Fav": loginUserId } }, { new: true });
+            return updatedMsgInfo;
+        } catch (error) {
+            this.logger.error(`Error while MarkMessagesAsFavorite ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async UnmarkMessagesAsFavorite(messageId: any, loginUserId: any) {
+        try {
+            const updatedMsgInfo = await Message.findOneAndUpdate({ _id: messageId }, { $pull: { "Fav": loginUserId } }, { new: true });
+            return updatedMsgInfo;
+        } catch (error) {
+            this.logger.error(`Error while UnmarkMessagesAsFavorite ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
     async SendPrivateMessage(msgInfo: any) {
         try {
             msgInfo = new Message(msgInfo);

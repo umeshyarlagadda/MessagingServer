@@ -32,6 +32,20 @@ export class MessageController {
         res.json(resp);
     }
 
+    @Put("MarkasFavorite/:messageId")
+    @UseFilters(ExceptionHandler)
+    async markMessageAsFavorite(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.MarkMessagesAsFavorite(req.params.messageId, res.locals.User.Id);
+        res.json(resp);
+    }
+
+    @Put("UnmarkasFavorite/:messageId")
+    @UseFilters(ExceptionHandler)
+    async unmarkMessageAsFavorite(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.messageSrvc.UnmarkMessagesAsFavorite(req.params.messageId, res.locals.User.Id);
+        res.json(resp);
+    }
+
     @Get("InitialPrivateMessages")
     @UseFilters(ExceptionHandler)
     async getInitialPrivateMessagesBetweenUsers(@Req() req: Request, @Res() res: Response) {

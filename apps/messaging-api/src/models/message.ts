@@ -6,7 +6,8 @@ const MessageSchema = new mongoose.Schema({
     Sender: { type: mongoose.Schema.ObjectId, ref: "User" },
     Receiver: { type: mongoose.Schema.ObjectId, ref: "User" },
     CrDt: { type: Date, default: Date.now },
-    ReadBy: [{ type: mongoose.Schema.ObjectId, ref: "User" }]
+    ReadBy: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+    Fav: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
 });
 
 const Message = mongoose.model("ConnectX.Message", MessageSchema, "ConnectX.Messages");
