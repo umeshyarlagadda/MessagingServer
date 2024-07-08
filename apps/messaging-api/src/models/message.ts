@@ -4,6 +4,7 @@ const MessageSchema = new mongoose.Schema({
     Msg: { type: String },      // Msg Content
     RoomId: { type: mongoose.Schema.ObjectId, ref: "ConnectX.Room" },
     Sender: { type: mongoose.Schema.ObjectId },
+    SName: { type: String },                                                // Sender Name
     Receiver: { type: mongoose.Schema.ObjectId },
     CrDt: { type: Date, default: Date.now },
     ReadBy: [{ type: mongoose.Schema.ObjectId }],

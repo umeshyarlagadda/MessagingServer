@@ -15,7 +15,7 @@ export class RoomController {
     @Get("PublicRoomBetween")
     @UseFilters(ExceptionHandler)
     async get(@Req() req: Request, @Res() res: Response) {
-        const resp = await this.roomSrvc.CheckAndGetPublicChatRoomBetween(req.query.RetailerId, req.query.RetailerEId, req.query.DistributorId, req.query.DistributorEId);
+        const resp = await this.roomSrvc.CheckAndGetPublicChatRoomBetween(req.query.LoginUserEId, req.query.ParticipantEId);
         res.json(resp);
     }
 
