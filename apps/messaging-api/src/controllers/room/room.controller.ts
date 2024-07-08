@@ -12,6 +12,13 @@ export class RoomController {
 
     constructor(public roomSrvc: RoomService) { }
 
+    @Get("PublicRoomBetween")
+    @UseFilters(ExceptionHandler)
+    async get(@Req() req: Request, @Res() res: Response) {
+        const resp = await this.roomSrvc.CheckAndGetPublicChatRoomBetween(req.query.RetailerId, req.query.RetailerEId, req.query.DistributorId, req.query.DistributorEId);
+        res.json(resp);
+    }
+
     @Post("Create")
     @UseFilters(ExceptionHandler)
     async createRoom(@Req() req: Request, @Res() res: Response) {

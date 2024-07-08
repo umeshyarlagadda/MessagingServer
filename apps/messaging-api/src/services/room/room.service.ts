@@ -103,13 +103,40 @@ export class RoomService {
             const query = {
                 Members: {
                     $elemMatch: { "UserId": loginUserId }
-                }, 
+                },
                 Del: { $ne: true }
             };
             const roomsList = await ChatRoom.find(query);
             return roomsList;
         } catch (error) {
             this.logger.error(`Error while GetChatRooms ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async CheckAndGetPublicChatRoomBetween(loginUserEId: any, particiapanEId: any) {
+        try {
+            const query = {
+                $or: [
+                    { Public: true, P1EId: loginUserEId, P2EId: particiapanEId },
+                    { Public: true, P1EId: particiapanEId, P2EId: loginUserEId }
+                ]
+            };
+            const chatRoom = await ChatRoom.findOne(query);
+            if (chatRoom == null) {
+                let newRoomInfo: any = {
+                    Public: true,
+                    P1EId: loginUserEId,
+                    P2EId: particiapanEId
+                }
+                newRoomInfo = new ChatRoom(newRoomInfo);
+                const savedRoom = await newRoomInfo.save();
+                return savedRoom;
+            } else {
+                return chatRoom;
+            }
+        } catch (error) {
+            this.logger.error(`Error while CheckAndGetPublicChatRoomBetween ${JSON.stringify(error)}`);
             throw error;
         }
     }
