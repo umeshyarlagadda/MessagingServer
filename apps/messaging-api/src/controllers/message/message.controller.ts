@@ -4,25 +4,25 @@ import { Response, Request } from 'express';
 import { ExceptionHandler } from '../../utils/exception-handler/exception-handler';
 import { UserAuthGuardService } from '../../services/user-auth-guard/user-auth-guard.service';
 import { MessageService } from '../../services/message/message.service';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { DeleteObjectsCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import cacheClient = require("../../utils/data-cache/data-cache");
 import { addSeconds, isBefore } from 'date-fns';
+import cacheClient = require("../../utils/data-cache/data-cache");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
-const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
 
 const s3 = new S3Client({
     credentials: {
-        accessKeyId: "AKIAZQ3DRPCQUN6YG6GD",
-        secretAccessKey: "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"
+        accessKeyId: process.env.S3AccessKey,
+        secretAccessKey: process.env.S3SecretKey
     },
-    region: "eu-north-1"
+    region: process.env.S3Region
 });
 const s3Storage = multerS3({
     s3: s3, // s3 instance
-    bucket: "reddybanapurams3", // change it as per your project requirement
+    bucket: process.env.S3MessagingBucket, // change it as per your project requirement
     metadata: (req, file, cb) => {
         cb(null, { fieldname: file.fieldname })
     },
@@ -223,7 +223,7 @@ export class MessageController {
         //     res.json(signedURLInfo.URL);
         // } else {
         const expiresIn = 15 * 60;
-        const command = new GetObjectCommand({ Bucket: 'reddybanapurams3', Key: req.params.fileKey });
+        const command = new GetObjectCommand({ Bucket: process.env.S3MessagingBucket, Key: req.params.fileKey });
         const url = await getSignedUrl(s3, command, { expiresIn: expiresIn }); // expires in seconds
         // cacheClient.Set(req.params.fileKey, { URL: url, ExpiresAt: addSeconds(new Date(), expiresIn) });
         res.json(url);
@@ -233,7 +233,7 @@ export class MessageController {
     @Get("DownloadS3File/:fileKey")
     @UseFilters(ExceptionHandler)
     async downloadS3File(@Req() req: Request, @Res() res: Response) {
-        const command = new GetObjectCommand({ Bucket: 'reddybanapurams3', Key: req.params.fileKey });
+        const command = new GetObjectCommand({ Bucket: process.env.S3MessagingBucket, Key: req.params.fileKey });
         const { Body } = await s3.send(command);
         res.set('Content-Disposition', `attachment; filename="${req.params.fileKey}"`);
         res.set('Content-Type', 'application/octet-stream');
@@ -246,7 +246,7 @@ export class MessageController {
         const lastMessage = await this.messageSrvc.IsLastRoomMessage(req.query.RoomId, req.query.RecordId);
         const objectsToDelete: any[] = [{ Key: req.query.FileKey }];
         const command = new DeleteObjectsCommand({
-            Bucket: 'reddybanapurams3',
+            Bucket: process.env.S3MessagingBucket,
             Delete: {
                 Objects: objectsToDelete,
                 Quiet: false, // Set to true to suppress response
@@ -285,7 +285,7 @@ export class MessageController {
         const lastMessage = await this.messageSrvc.IsLastPrivateMessage(res.locals.User.Id, req.query.ParticipantId, req.query.RecordId);
         const objectsToDelete: any[] = [{ Key: req.query.FileKey }];
         const command = new DeleteObjectsCommand({
-            Bucket: 'reddybanapurams3',
+            Bucket: process.env.S3MessagingBucket,
             Delete: {
                 Objects: objectsToDelete,
                 Quiet: false, // Set to true to suppress response
@@ -325,7 +325,7 @@ export class MessageController {
         if (lastMessage.Files != null && lastMessage.Files.length !== 0) {
             const objectsToDelete = lastMessage.Files.map(file => ({ Key: file.Url }));
             const command = new DeleteObjectsCommand({
-                Bucket: 'reddybanapurams3',
+                Bucket: process.env.S3MessagingBucket,
                 Delete: {
                     Objects: objectsToDelete,
                     Quiet: false, // Set to true to suppress response
@@ -358,7 +358,7 @@ export class MessageController {
         if (lastMessage.Files != null && lastMessage.Files.length !== 0) {
             const objectsToDelete = lastMessage.Files.map(file => ({ Key: file.Url }));
             const command = new DeleteObjectsCommand({
-                Bucket: 'reddybanapurams3',
+                Bucket: process.env.S3MessagingBucket,
                 Delete: {
                     Objects: objectsToDelete,
                     Quiet: false, // Set to true to suppress response
