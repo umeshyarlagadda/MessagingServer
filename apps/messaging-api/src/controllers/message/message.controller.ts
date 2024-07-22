@@ -13,16 +13,21 @@ const multer = require("multer");
 const multerS3 = require("multer-s3");
 const { S3Client } = require("@aws-sdk/client-s3");
 
+const S3AccessKey='AKIAZQ3DRPCQUN6YG6GD';
+const S3SecretKey='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';
+const S3Region='eu-north-1';
+const S3MessagingBucket='reddybanapurams3';
+
 const s3 = new S3Client({
     credentials: {
-        accessKeyId: process.env.S3AccessKey,
-        secretAccessKey: process.env.S3SecretKey
+        accessKeyId: S3AccessKey,
+        secretAccessKey: S3SecretKey
     },
-    region: process.env.S3Region
+    region: S3Region
 });
 const s3Storage = multerS3({
     s3: s3, // s3 instance
-    bucket: process.env.S3MessagingBucket, // change it as per your project requirement
+    bucket: S3MessagingBucket, // change it as per your project requirement
     metadata: (req, file, cb) => {
         cb(null, { fieldname: file.fieldname })
     },
@@ -223,7 +228,7 @@ export class MessageController {
         //     res.json(signedURLInfo.URL);
         // } else {
         const expiresIn = 15 * 60;
-        const command = new GetObjectCommand({ Bucket: process.env.S3MessagingBucket, Key: req.params.fileKey });
+        const command = new GetObjectCommand({ Bucket: S3MessagingBucket, Key: req.params.fileKey });
         const url = await getSignedUrl(s3, command, { expiresIn: expiresIn }); // expires in seconds
         // cacheClient.Set(req.params.fileKey, { URL: url, ExpiresAt: addSeconds(new Date(), expiresIn) });
         res.json(url);
@@ -233,7 +238,7 @@ export class MessageController {
     @Get("DownloadS3File/:fileKey")
     @UseFilters(ExceptionHandler)
     async downloadS3File(@Req() req: Request, @Res() res: Response) {
-        const command = new GetObjectCommand({ Bucket: process.env.S3MessagingBucket, Key: req.params.fileKey });
+        const command = new GetObjectCommand({ Bucket: S3MessagingBucket, Key: req.params.fileKey });
         const { Body } = await s3.send(command);
         res.set('Content-Disposition', `attachment; filename="${req.params.fileKey}"`);
         res.set('Content-Type', 'application/octet-stream');
@@ -246,7 +251,7 @@ export class MessageController {
         const lastMessage = await this.messageSrvc.IsLastRoomMessage(req.query.RoomId, req.query.RecordId);
         const objectsToDelete: any[] = [{ Key: req.query.FileKey }];
         const command = new DeleteObjectsCommand({
-            Bucket: process.env.S3MessagingBucket,
+            Bucket: S3MessagingBucket,
             Delete: {
                 Objects: objectsToDelete,
                 Quiet: false, // Set to true to suppress response
@@ -285,7 +290,7 @@ export class MessageController {
         const lastMessage = await this.messageSrvc.IsLastPrivateMessage(res.locals.User.Id, req.query.ParticipantId, req.query.RecordId);
         const objectsToDelete: any[] = [{ Key: req.query.FileKey }];
         const command = new DeleteObjectsCommand({
-            Bucket: process.env.S3MessagingBucket,
+            Bucket: S3MessagingBucket,
             Delete: {
                 Objects: objectsToDelete,
                 Quiet: false, // Set to true to suppress response
@@ -325,7 +330,7 @@ export class MessageController {
         if (lastMessage.Files != null && lastMessage.Files.length !== 0) {
             const objectsToDelete = lastMessage.Files.map(file => ({ Key: file.Url }));
             const command = new DeleteObjectsCommand({
-                Bucket: process.env.S3MessagingBucket,
+                Bucket: S3MessagingBucket,
                 Delete: {
                     Objects: objectsToDelete,
                     Quiet: false, // Set to true to suppress response
@@ -358,7 +363,7 @@ export class MessageController {
         if (lastMessage.Files != null && lastMessage.Files.length !== 0) {
             const objectsToDelete = lastMessage.Files.map(file => ({ Key: file.Url }));
             const command = new DeleteObjectsCommand({
-                Bucket: process.env.S3MessagingBucket,
+                Bucket: S3MessagingBucket,
                 Delete: {
                     Objects: objectsToDelete,
                     Quiet: false, // Set to true to suppress response
