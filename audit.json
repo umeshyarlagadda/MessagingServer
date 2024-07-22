@@ -8,39 +8,39 @@
     "extension": "",
     "files": [
         {
-            "date": 1720080042856,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-04-warn.stream.log",
-            "hash": "651d3fbb5030bbcb9897e790390df59b"
+            "date": 1721032466486,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-15-warn.stream.log",
+            "hash": "e4e824790a29cca0060c46ec7dc586f6"
         },
         {
-            "date": 1720423690727,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-08-debug.stream.log",
-            "hash": "6c0158eae2a4761144655fb6da4240ed"
+            "date": 1721206748591,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-17-debug.stream.log",
+            "hash": "4d73102ad92d84dc217084de39109365"
         },
         {
-            "date": 1720423690734,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-08-error.stream.log",
-            "hash": "b4a6d78dadf954490c232d767bf172a4"
+            "date": 1721206748596,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-17-error.stream.log",
+            "hash": "e7aa26f296722d934c5bfea58638ed88"
         },
         {
-            "date": 1720423690736,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-08-fatal.stream.log",
-            "hash": "91f31875a2b53051740395f0d5804b49"
+            "date": 1721206748597,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-17-fatal.stream.log",
+            "hash": "1b05e7ae50851a52757f8d205971037d"
         },
         {
-            "date": 1720423690738,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-08-info.stream.log",
-            "hash": "5fb6f6e098024258c21f1e5bc1f0089e"
+            "date": 1721206748600,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-17-info.stream.log",
+            "hash": "0bd07eb67eeecdcef1df81a0bc9b2a56"
         },
         {
-            "date": 1720423690740,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-08-trace.stream.log",
-            "hash": "c63d55e2e747cef42e7197fd5b6664e1"
+            "date": 1721206748602,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-17-trace.stream.log",
+            "hash": "60f3024866b2408c3f0f384f040bffc4"
         },
         {
-            "date": 1720423690743,
-            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-08-warn.stream.log",
-            "hash": "daa4149942a199d3ff3876ae727cfa22"
+            "date": 1721206748604,
+            "name": "C:\\CCT\\MessagingServer\\dist\\apps\\messaging-api\\logs\\2024-07-17-warn.stream.log",
+            "hash": "03c99777a3451e1d19fc1102e1a4392b"
         }
     ]
 }

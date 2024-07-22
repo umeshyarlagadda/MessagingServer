@@ -55,6 +55,15 @@ export class MessageService {
 
     async SendRoomMessage(msgInfo: any) {
         try {
+            if (msgInfo.NewMember) {
+                const updatedRoom = await ChatRoom.findByIdAndUpdate({ _id: msgInfo.RoomId },
+                    { $addToSet: { Members: { UserId: msgInfo.Sender, Name: msgInfo.MemberName, Write: true } } }, { new: true });
+                if (updatedRoom != null) {
+                    this.socketSrvc.EmitValueToSocket('UpdateRoomDetails', updatedRoom);
+                } else {
+                    throw { message: "Sorry this message can't be sent" };
+                }
+            }
             msgInfo = new Message(msgInfo);
             const savedMsg = await msgInfo.save();
             this.socketSrvc.EmitValueToSocket('NewChatRoomMessage', savedMsg);
@@ -251,6 +260,125 @@ export class MessageService {
             return roomsList;
         } catch (error) {
             this.logger.error(`Error while GetUnreadRoomMsgDetails ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async IsLastPrivateMessage(loginUserId: any, participantUserId: any, recordId: any) {
+        try {
+            const lastMessage = await Message.findOne({
+                $or: [
+                    { Sender: loginUserId, Receiver: participantUserId },
+                    { Sender: participantUserId, Receiver: loginUserId }
+                ]
+            }).sort({ _id: -1 });
+            if (lastMessage != null && lastMessage._id + '' == recordId) {
+                return lastMessage;
+            } else {
+                throw { message: "Sorry this message can't be deleted" };
+            }
+        } catch (error) {
+            this.logger.error(`Error while IsLastPrivateMessage ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async DeletePrivateMessage(lastMessage: any) {
+        try {
+            const deleteInfo = await Message.deleteOne({ _id: lastMessage._id });
+            if (deleteInfo.acknowledged && deleteInfo.deletedCount > 0) {
+                this.socketSrvc.EmitValueToSocket('DeletedPrivateMessage', lastMessage);
+                return lastMessage;
+            } else {
+                throw { message: "Sorry this message can't be deleted" };
+            }
+        } catch (error) {
+            this.logger.error(`Error while DeletePrivateMessage ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async IsLastRoomMessage(roomId: any, recordId: any) {
+        try {
+            const lastMessage = await Message.findOne({
+                RoomId: roomId
+            }).sort({ _id: -1 });
+            if (lastMessage != null && lastMessage._id + '' == recordId) {
+                return lastMessage;
+            } else {
+                throw { message: "Sorry this message can't be deleted" };
+            }
+        } catch (error) {
+            this.logger.error(`Error while IsLastRoomMessage ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async DeleteRoomMessage(lastMessage: any) {
+        try {
+            const deleteInfo = await Message.deleteOne({ _id: lastMessage._id });
+            if (deleteInfo.acknowledged && deleteInfo.deletedCount > 0) {
+                this.socketSrvc.EmitValueToSocket('DeletedRoomMessage', lastMessage);
+                return lastMessage;
+            } else {
+                throw { message: "Sorry this message can't be deleted" };
+            }
+        } catch (error) {
+            this.logger.error(`Error while DeleteRoomMessage ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async EditPrivateMessage(msgInfo: any) {
+        try {
+            const lastMessage = await Message.findOne({
+                $or: [
+                    { Sender: msgInfo.Sender, Receiver: msgInfo.Receiver },
+                    { Sender: msgInfo.Receiver, Receiver: msgInfo.Sender }
+                ]
+            }).sort({ _id: -1 });
+            if (lastMessage != null && lastMessage._id + '' == msgInfo._id) {
+                const updatedMsgInfo = await Message.findOneAndUpdate({ _id: msgInfo._id }, { $set: { Msg: msgInfo.Msg, Edit: true } }, { new: true });
+                this.socketSrvc.EmitValueToSocket('UpdatedPrivateMessage', updatedMsgInfo);
+                return updatedMsgInfo;
+            } else {
+                throw { message: "Sorry this message can't be edited" };
+            }
+        } catch (error) {
+            this.logger.error(`Error while EditPrivateMessage ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async EditRoomMessage(msgInfo: any) {
+        try {
+            const lastMessage = await Message.findOne({
+                RoomId: msgInfo.RoomId
+            }).sort({ _id: -1 });
+            if (lastMessage != null && lastMessage._id + '' == msgInfo._id) {
+                const updatedMsgInfo = await Message.findOneAndUpdate({ _id: msgInfo._id }, { $set: { Msg: msgInfo.Msg, Edit: true } }, { new: true });
+                this.socketSrvc.EmitValueToSocket('UpdatedRoomMessage', updatedMsgInfo);
+                return updatedMsgInfo;
+            } else {
+                throw { message: "Sorry this message can't be edited" };
+            }
+        } catch (error) {
+            this.logger.error(`Error while EditRoomMessage ${JSON.stringify(error)}`);
+            throw error;
+        }
+    }
+
+    async UpdateMessageFiles(recordId: any, latestFiles: any, isPrivateRoom: boolean) {
+        try {
+            const updatedMsgInfo = await Message.findOneAndUpdate({ _id: recordId }, { $set: { Files: latestFiles } }, { new: true });
+            if (isPrivateRoom) {
+                this.socketSrvc.EmitValueToSocket('UpdatedPrivateMessage', updatedMsgInfo);
+            } else {
+                this.socketSrvc.EmitValueToSocket('UpdatedRoomMessage', updatedMsgInfo);
+            }
+            return updatedMsgInfo;
+        } catch (error) {
+            this.logger.error(`Error while UpdateMessageFiles ${JSON.stringify(error)}`);
             throw error;
         }
     }

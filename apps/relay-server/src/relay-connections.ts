@@ -24,6 +24,7 @@ export function InitializeConnection(argIOSocket: any) {
             socket.data.UserId = userId;
             const userOnline = cacheClient.AddSocketToConnectedClients(socket.data.UserId, socket.id);
             EmitRelayInfoToRoom('UserState-' + userId, "UserState", { UserId: socket.data.UserId, Online: userOnline });
+            socket.join('UserUpdates-' + userId);
         });
 
         socket.on("LeaveChat", async function () {
@@ -31,36 +32,29 @@ export function InitializeConnection(argIOSocket: any) {
             const userOnline = cacheClient.RemoveSocketFromConnectedClients(socket.data.UserId, socket.id);
             EmitRelayInfoToRoom('UserState-' + socket.data.UserId, "UserState", { UserId: socket.data.UserId, Online: userOnline });
             EmitTypingStopToRoom(socket);
+            socket.leave('UserUpdates-' + socket.data.UserId);
         });
 
-        socket.on("ListenUserState", async function (userIds: any) {
-            console.log("Listen Online state of user " + JSON.stringify(userIds));
-            userIds.forEach((userId: any) => {
-                socket.join('UserState-' + userId);
-                const userOnline = cacheClient.GetUserOnlineState(userId);
-                EmitRelayInfoToClient(socket, "UserState", { UserId: userId, Online: userOnline });
-            });
+        socket.on("ListenUserState", async function (userId: any) {
+            console.log("Listen Online state of user " + userId);
+            socket.join('UserState-' + userId);
+            const userOnline = cacheClient.GetUserOnlineState(userId);
+            EmitRelayInfoToClient(socket, "UserState", { UserId: userId, Online: userOnline });
         });
 
-        socket.on("LeaveUserState", async function (userIds: any) {
-            console.log("Leave Online state of user " + JSON.stringify(userIds));
-            userIds.forEach((userId: any) => {
-                socket.leave('UserState-' + userId);
-            });
+        socket.on("LeaveUserState", async function (userId: any) {
+            console.log("Leave Online state of user " + userId);
+            socket.leave('UserState-' + userId);
         });
 
-        socket.on("JoinMessageRoom", async function (roomIds: any) {
-            console.log("User Joining Chat Room for " + JSON.stringify(roomIds));
-            roomIds.forEach((roomId: any) => {
-                socket.join(roomId);
-            });
+        socket.on("JoinMessageRoom", async function (roomId: any) {
+            console.log("User Joining Chat Room for " + roomId);
+            socket.join(roomId);
         });
 
-        socket.on("LeaveMessageRoom", async function (roomIds: any) {
-            console.log("User Leaving Chat Room for " + JSON.stringify(roomIds));
-            roomIds.forEach((roomId: any) => {
-                socket.leave(roomId);
-            });
+        socket.on("LeaveMessageRoom", async function (roomId: any) {
+            console.log("User Leaving Chat Room for " + roomId);
+            socket.leave(roomId);
         });
 
         socket.on("NewChatRoomMessage", function (payload: any) {
@@ -68,17 +62,12 @@ export function InitializeConnection(argIOSocket: any) {
         });
 
         socket.on("NewPrivateMessage", function (payload: any) {
-            const sockets = cacheClient.GetUserSockets(payload.Receiver);
-            sockets.forEach((argSocket: any) => {
-                ioSocket.to(argSocket).emit("NewMessage", payload);
-            });
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Sender, "NewMessage", payload);
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Receiver, "NewMessage", payload);
         });
 
         socket.on("UserPvtMsgTyping", function (payload: any) {
-            const sockets = cacheClient.GetUserSockets(payload.Receiver);
-            sockets.forEach((argSocket: any) => {
-                ioSocket.to(argSocket).emit("UserTyping", payload);
-            });
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Receiver, "UserTyping", payload);
         });
 
         socket.on("UserRoomMsgTyping", function (payload: any) {
@@ -87,10 +76,29 @@ export function InitializeConnection(argIOSocket: any) {
         });
 
         socket.on("PvtMessageRead", function (payload: any) {
-            const sockets = cacheClient.GetUserSockets(payload.SentBy);
-            sockets.forEach((argSocket: any) => {
-                ioSocket.to(argSocket).emit("MessageRead", payload);
-            });
+            EmitRelayInfoToRoom('UserUpdates-' + payload.SentBy, "MessageRead", payload);
+        });
+
+        socket.on("DeletedPrivateMessage", function (payload: any) {
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Sender, "DeletedMessage", payload);
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Receiver, "DeletedMessage", payload);
+        });
+
+        socket.on("DeletedRoomMessage", function (payload: any) {
+            EmitRelayInfoToRoom(payload.RoomId, "DeletedMessage", payload);
+        });
+
+        socket.on("UpdatedPrivateMessage", function (payload: any) {
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Sender, "UpdatedMessage", payload);
+            EmitRelayInfoToRoom('UserUpdates-' + payload.Receiver, "UpdatedMessage", payload);
+        });
+
+        socket.on("UpdatedRoomMessage", function (payload: any) {
+            EmitRelayInfoToRoom(payload.RoomId, "UpdatedMessage", payload);
+        });
+
+        socket.on("UpdateRoomDetails", function (payload: any) {
+            EmitRelayInfoToRoom(payload._id, "UpdatedRoom", payload);
         });
 
     });

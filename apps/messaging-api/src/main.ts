@@ -6,6 +6,7 @@ import { SocketService } from './services/socket/socket.service';
 import { ConfigService } from '@app/config';
 import { SmsService } from './services/sms/sms.service';
 import { EmailService } from './services/email/email.service';
+import cacheClient = require("./utils/data-cache/data-cache");
 
 async function bootstrap() {
   const options: any = {
@@ -22,6 +23,8 @@ async function bootstrap() {
   const emailSrvc = app.get(EmailService);
   smsSrvc.InitializeProvider();
   emailSrvc.InitializeProvider();
+  // cacheClient.redisServerURL = process.env.REDIS_SERVER;
+  // cacheClient.connectRedis();
   const socketSrvc = app.get(SocketService);
   socketSrvc.InitializeSocket();
   await app.listen(process.env.Messaging_PORT);
