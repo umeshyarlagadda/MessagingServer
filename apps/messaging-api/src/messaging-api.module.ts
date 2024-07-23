@@ -10,8 +10,6 @@ import { SocketService } from './services/socket/socket.service';
 import { UserAuthGuardService } from './services/user-auth-guard/user-auth-guard.service';
 import { RoomController } from './controllers/room/room.controller';
 import { RoomService } from './services/room/room.service';
-import { EmailService } from './services/email/email.service';
-import { SmsService } from './services/sms/sms.service';
 import { AraneusConfigModule } from '@app/config';
 const path = require("path");
 const multistream = require('pino-multi-stream').multistream;
@@ -40,6 +38,6 @@ export const LoggerStreams = [
     providers: [{
         provide: APP_FILTER,
         useClass: ExceptionHandler
-    }, MessageService, SocketService, UserAuthGuardService, RoomService, EmailService, SmsService],
+    }, MessageService, SocketService, UserAuthGuardService, RoomService],
 })
 export class MessagingApiModule { }

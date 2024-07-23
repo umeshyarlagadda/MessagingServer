@@ -4,8 +4,6 @@ import { NestFactory } from '@nestjs/core';
 import { MessagingApiModule } from './messaging-api.module';
 import { SocketService } from './services/socket/socket.service';
 import { ConfigService } from '@app/config';
-import { SmsService } from './services/sms/sms.service';
-import { EmailService } from './services/email/email.service';
 import cacheClient = require("./utils/data-cache/data-cache");
 
 async function bootstrap() {
@@ -19,10 +17,6 @@ async function bootstrap() {
   app.enableCors();
   const configSrvc = app.get(ConfigService);
   await configSrvc.GetEntireConfigFromDB();
-  const smsSrvc = app.get(SmsService);
-  const emailSrvc = app.get(EmailService);
-  smsSrvc.InitializeProvider();
-  emailSrvc.InitializeProvider();
   // cacheClient.redisServerURL = process.env.REDIS_SERVER;
   // cacheClient.connectRedis();
   const socketSrvc = app.get(SocketService);
